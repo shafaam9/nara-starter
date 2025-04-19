@@ -18,6 +18,10 @@
     {
       "resources": ["scripts/Sortable.min.js"],
       "matches": ["<all_urls>"]
+    },
+    {
+      "resources": ["mood.html", "assets/mood-icons/*.png"],
+      "matches": ["<all_urls>"]
     }
   ]
 }
