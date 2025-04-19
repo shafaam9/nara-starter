@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "assets/A2.png",
       "assets/A3.png",
       "assets/A4.png",
-      "assets/A5.png",
+      "assets/A5.png", 
     ],
     home: [
       "assets/B.png",
@@ -508,6 +508,53 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Encouraging messages
+  const encouragementMessages = [
+    "Great job!",
+    "You're making progress!",
+    "Keep going!",
+    "Well done!",
+    "You're amazing!",
+    "Fantastic work!",
+    "You're unstoppable!",
+    "Keep up the great work!",
+  ];
+
+  // Function to show speech bubble
+  function showSpeechBubble(message) {
+    const speechBubble = document.createElement("div");
+    speechBubble.className = "speech-bubble";
+    speechBubble.textContent = message;
+
+    // Try to position near the first visible deer circle, fallback to center
+    let deerElement = null;
+    for (let i = 1; i <= 6; i++) {
+      const el = document.getElementById(`deer${i}-circle`);
+      if (el && !el.classList.contains("hidden")) {
+        deerElement = el;
+        break;
+      }
+    }
+    if (!deerElement) deerElement = document.body;
+
+    const deerRect = deerElement.getBoundingClientRect();
+    // If deerElement is body, center the bubble
+    if (deerElement === document.body) {
+      speechBubble.style.top = "30%";
+      speechBubble.style.left = "50%";
+      speechBubble.style.transform = "translate(-50%, -50%)";
+    } else {
+      speechBubble.style.top = `${deerRect.top - 40 + window.scrollY}px`;
+      speechBubble.style.left = `${deerRect.left + deerRect.width / 2 - 80 + window.scrollX}px`;
+    }
+
+    document.body.appendChild(speechBubble);
+
+    setTimeout(() => {
+      speechBubble.remove();
+    }, 2200);
+  }
+
   function renderTasks(tasks, backgroundIndex, category) {
     const tasksHeader = document.getElementById("tasks-header") || document.createElement("div");
     tasksHeader.id = "tasks-header";
@@ -556,7 +603,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const originalIndex = tasks.indexOf(task);
         tasks[originalIndex].completed = checkbox.checked;
         if (tasks[originalIndex].completed) {
-          const deleteButton = taskItem.querySelector(".delete-task");
+          const deleteButton = checkbox.closest("li").querySelector(".delete-task");
           if (deleteButton) deleteButton.remove();
         }
         let newPosition = 0;
@@ -591,6 +638,16 @@ document.addEventListener("DOMContentLoaded", () => {
             selectedCategory: category,
           },
         });
+      feature/mood-selection
+
+        if (checkbox.checked) {
+          const randomMessage =
+            encouragementMessages[
+              Math.floor(Math.random() * encouragementMessages.length)
+            ];
+          showSpeechBubble(randomMessage);
+        }
+       main
         if (sortableInstance) {
           const taskItems = Array.from(taskListElement.children);
           const oldItemEl = taskItems[originalIndex];
