@@ -1,7 +1,21 @@
 # CIS 3500: Nara Extension Starter
 
 ## Overview
-This assignment involves enhancing a Chrome extension developed by one of the Top 3 winners of the MCIT hackathon. The project provides hands-on experience in web development, API integration, and collaborative coding.
+For this project, Shafaa and Andrea contributed to the Nara Extension Starter by implementing the following features:
+
+1. Rotating Weekly Challenge (Shafaa)
+
+- Added a “Weekly Challenge” module that selects a new mini‑challenge each Monday from a configurable list (e.g. “Drink 8 glasses of water,” “Take a 10‑minute walk”).
+
+- Integrated checkboxes next to each challenge so users can mark progress alongside their normal tasks.
+
+- Persisted completion state in Chrome storage and automatically resets the challenge at the start of each week.
+
+2. Inspirational Quote Overlay (Andrea)
+
+- Created a New Tab override that displays a randomly chosen inspirational quote or affirmation on every tab load.
+
+- Styled the overlay to be lightweight and unobtrusive (opacity, font size, positioning).
 
 **Original project:** [Nara](https://github.com/luyiZhang818/Nara-Chrome-Extension)
 
