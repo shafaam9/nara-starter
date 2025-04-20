@@ -349,12 +349,16 @@ document.addEventListener("DOMContentLoaded", () => {
     tasksContainer.innerHTML = "";
     const header = document.createElement("div");
     header.id = "tasks-header";
+
+    addInspirationalQuoteBox();
+
     header.innerHTML = `
       <h1 class="task-title">today's list</h1>
       <p class="task-subtitle">some tasks to help you feel good</p>`;
     const weeklyUI = createWeeklyUI();
     header.appendChild(weeklyUI);
     tasksContainer.appendChild(header);
+
     const checkbox = weeklyUI.querySelector("#challenge-checkbox");
     const label = weeklyUI.querySelector("#challenge-text");
     loadWeekly(checkbox, label);
@@ -464,6 +468,21 @@ document.addEventListener("DOMContentLoaded", () => {
         );
       }
     });
+  }
+
+  function addInspirationalQuoteBox() {
+    const quoteBox = document.createElement("div");
+    quoteBox.className = "quote-overlay";
+    const quotes = [
+      "Believe in yourself and all that you are.",
+      "Every day is a second chance.",
+      "You are capable of amazing things.",
+      "Stay positive, work hard, make it happen.",
+      "Dream big and dare to fail."
+    ];
+    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+    quoteBox.textContent = randomQuote;
+    tasksContainer.appendChild(quoteBox);
   }
 
   chrome.storage.local.get("state", data => {
