@@ -11,11 +11,21 @@ For this project, Shafaa and Andrea contributed to the Nara Extension Starter by
 
 - Persisted completion state in Chrome storage and automatically resets the challenge at the start of each week.
 
-2. Inspirational Quote Overlay (Andrea)
+2. Inspirational Quote Overlay (Shafaa)
 
 - Created a New Tab override that displays a randomly chosen inspirational quote or affirmation on every tab load.
 
 - Styled the overlay to be lightweight and unobtrusive (opacity, font size, positioning).
+
+3. Speech Bubble Encouragement (Andrea)
+
+- Implemented a feature such that whenever a user has completed their task, a thought bubble appears with encouraging message
+  
+- Designed the feature to bubble up slightly and disappear after a few seconds.
+
+4. Mood Selection Prompt (Andrea)
+
+- Designed a mood selection feature that allows users to choose a mood that they align with in order to store their emotional state
 
 **Original project:** [Nara](https://github.com/luyiZhang818/Nara-Chrome-Extension)
 
