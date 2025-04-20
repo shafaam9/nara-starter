@@ -749,4 +749,57 @@ document.addEventListener("DOMContentLoaded", () => {
   createMoodSelector();
   loadMoodForToday();
   // --- Mood Selection Feature End ---
+
+  // --- Inspirational Quote Overlay Feature ---
+  const inspirationalQuotes = [
+    "Believe in yourself and all that you are.",
+    "Every day is a second chance.",
+    "You are capable of amazing things.",
+    "Stay positive, work hard, make it happen.",
+    "Dream big and dare to fail.",
+    "Small steps every day.",
+    "You are stronger than you think.",
+    "Progress, not perfection.",
+    "Be gentle with yourself.",
+    "You got this!",
+    "Let your dreams be bigger than your fears.",
+    "The best time for new beginnings is now.",
+    "Happiness is a journey, not a destination.",
+    "Your only limit is your mind.",
+    "Start where you are. Use what you have. Do what you can.",
+    "Difficult roads often lead to beautiful destinations.",
+    "You are enough.",
+    "Take it one day at a time.",
+    "Keep moving forward.",
+    "Kindness changes everything."
+  ];
+
+  function showInspirationalQuoteOverlay() {
+    let quoteOverlay = document.getElementById("quote-overlay");
+    if (!quoteOverlay) {
+      quoteOverlay = document.createElement("div");
+      quoteOverlay.id = "quote-overlay";
+      quoteOverlay.className = "quote-overlay";
+      quoteOverlay.style.position = "fixed";
+      quoteOverlay.style.bottom = "40px";
+      quoteOverlay.style.left = "50%";
+      quoteOverlay.style.transform = "translateX(-50%)";
+      quoteOverlay.style.background = "rgba(255,255,255,0.85)";
+      quoteOverlay.style.borderRadius = "18px";
+      quoteOverlay.style.padding = "14px 32px";
+      quoteOverlay.style.fontSize = "1.1rem";
+      quoteOverlay.style.color = "#4158D0";
+      quoteOverlay.style.fontFamily = "'DM Sans', sans-serif";
+      quoteOverlay.style.boxShadow = "0 4px 24px rgba(0,0,0,0.08)";
+      quoteOverlay.style.zIndex = "1003";
+      quoteOverlay.style.textAlign = "center";
+      quoteOverlay.style.maxWidth = "80vw";
+      quoteOverlay.style.pointerEvents = "none";
+      document.body.appendChild(quoteOverlay);
+    }
+    const quote = inspirationalQuotes[Math.floor(Math.random() * inspirationalQuotes.length)];
+    quoteOverlay.textContent = quote;
+  }
+
+  showInspirationalQuoteOverlay();
 });
