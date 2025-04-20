@@ -389,11 +389,30 @@ document.addEventListener("DOMContentLoaded", () => {
             selectedCategory: cat
           }
         });
-        if (cb.checked) {
-          const msg = encouragementMessages[
-            Math.floor(Math.random() * encouragementMessages.length)
-          ];
-          showSpeechBubble(msg);
+
+        if (checkbox.checked) {
+          const randomMessage =
+            encouragementMessages[
+              Math.floor(Math.random() * encouragementMessages.length)
+            ];
+          showSpeechBubble(randomMessage);
+        }
+
+        if (sortableInstance) {
+          const taskItems = Array.from(taskListElement.children);
+          const oldItemEl = taskItems[originalIndex];
+          taskListElement.removeChild(oldItemEl);
+          taskListElement.insertBefore(oldItemEl, taskListElement.children[newPosition]);
+          sortableInstance.option("animation", 600);
+          sortableInstance.option("onEnd", null);
+          const evt = new CustomEvent("sortable:start");
+          taskListElement.dispatchEvent(evt);
+          oldItemEl.style.transition = "all 600ms ease";
+          oldItemEl.style.animation = "moveTask 600ms ease";
+          setTimeout(() => {
+            oldItemEl.style.transition = "";
+            oldItemEl.style.animation = "";
+          }, 600);
         }
         changeBackgroundWithSlide(
           backgroundSets[cat][isFinalImage ? backgroundSets[cat].length - 1 : newBg]
@@ -514,6 +533,201 @@ document.addEventListener("DOMContentLoaded", () => {
       const circle = document.getElementById(`${area.id}-circle`);
       circle.classList.remove("hidden");
     });
-    resetModal.classList.add("hidden");
-  });
+    loadWeeklyChallenge(checkbox, label);
+  }
+
+  // --- Mood Selection Feature Start ---
+  // Mood options
+  const moods = [
+    { name: "Happy", emoji: "😊" },
+    { name: "Neutral", emoji: "😐" },
+    { name: "Stressed", emoji: "😣" },
+    { name: "Sad", emoji: "😢" },
+    { name: "Excited", emoji: "🤩" },
+  ];
+
+  // Create mood selection UI
+  function createMoodSelector() {
+    const moodContainer = document.createElement("div");
+    moodContainer.id = "mood-selector-container";
+    moodContainer.style.position = "fixed";
+    moodContainer.style.top = "20px";
+    moodContainer.style.right = "100px";
+    moodContainer.style.background = "rgba(255,255,255,0.8)";
+    moodContainer.style.borderRadius = "16px";
+    moodContainer.style.padding = "10px 18px";
+    moodContainer.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)";
+    moodContainer.style.display = "flex";
+    moodContainer.style.alignItems = "center";
+    moodContainer.style.gap = "10px";
+    moodContainer.style.zIndex = "1002";
+
+    const label = document.createElement("span");
+    label.textContent = "How are you feeling?";
+    label.style.fontSize = "15px";
+    label.style.color = "#333";
+    label.style.marginRight = "8px";
+    moodContainer.appendChild(label);
+
+    moods.forEach((mood) => {
+      const btn = document.createElement("button");
+      btn.className = "mood-btn";
+      btn.type = "button";
+      btn.title = mood.name;
+      btn.textContent = mood.emoji;
+      btn.style.fontSize = "22px";
+      btn.style.background = "none";
+      btn.style.border = "none";
+      btn.style.cursor = "pointer";
+      btn.style.transition = "transform 0.15s";
+      btn.style.borderRadius = "50%";
+      btn.style.padding = "3px";
+      btn.setAttribute("aria-label", mood.name);
+
+      btn.addEventListener("mouseenter", () => {
+        btn.style.transform = "scale(1.2)";
+        btn.style.background = "#f3f4f6";
+      });
+      btn.addEventListener("mouseleave", () => {
+        btn.style.transform = "";
+        btn.style.background = "none";
+      });
+
+      btn.addEventListener("click", () => {
+        saveMoodForToday(mood);
+        highlightSelectedMood(mood.name);
+      });
+
+      moodContainer.appendChild(btn);
+    });
+
+    // Mood log button
+    const logBtn = document.createElement("button");
+    logBtn.textContent = "🗒️";
+    logBtn.title = "View Mood Log";
+    logBtn.style.fontSize = "18px";
+    logBtn.style.marginLeft = "10px";
+    logBtn.style.background = "none";
+    logBtn.style.border = "none";
+    logBtn.style.cursor = "pointer";
+    logBtn.style.borderRadius = "50%";
+    logBtn.style.padding = "3px";
+    logBtn.addEventListener("click", showMoodLogModal);
+    moodContainer.appendChild(logBtn);
+
+    document.body.appendChild(moodContainer);
+  }
+
+  // Save mood for today in chrome.storage.local
+  function saveMoodForToday(mood) {
+    const today = new Date().toISOString().slice(0, 10);
+    chrome.storage.local.get({ moodLog: {} }, (data) => {
+      const moodLog = data.moodLog || {};
+      moodLog[today] = { name: mood.name, emoji: mood.emoji };
+      chrome.storage.local.set({ moodLog });
+    });
+  }
+
+  // Highlight selected mood for today
+  function highlightSelectedMood(selectedMoodName) {
+    const btns = document.querySelectorAll("#mood-selector-container .mood-btn");
+    btns.forEach((btn) => {
+      if (btn.title === selectedMoodName) {
+        btn.style.background = "#d1fae5";
+        btn.style.boxShadow = "0 0 0 2px #10b981";
+      } else {
+        btn.style.background = "none";
+        btn.style.boxShadow = "none";
+      }
+    });
+  }
+
+  // On load, highlight today's mood if set
+  function loadMoodForToday() {
+    const today = new Date().toISOString().slice(0, 10);
+    chrome.storage.local.get({ moodLog: {} }, (data) => {
+      const moodLog = data.moodLog || {};
+      if (moodLog[today]) {
+        highlightSelectedMood(moodLog[today].name);
+      }
+    });
+  }
+
+  // Mood log modal
+  function showMoodLogModal() {
+    let modal = document.getElementById("mood-log-modal");
+    if (modal) {
+      modal.classList.remove("hidden");
+      return;
+    }
+    modal = document.createElement("div");
+    modal.id = "mood-log-modal";
+    modal.style.position = "fixed";
+    modal.style.top = "0";
+    modal.style.left = "0";
+    modal.style.width = "100vw";
+    modal.style.height = "100vh";
+    modal.style.background = "rgba(0,0,0,0.35)";
+    modal.style.backdropFilter = "blur(4px)";
+    modal.style.display = "flex";
+    modal.style.alignItems = "center";
+    modal.style.justifyContent = "center";
+    modal.style.zIndex = "2000";
+
+    const content = document.createElement("div");
+    content.style.background = "rgba(255,255,255,0.96)";
+    content.style.borderRadius = "16px";
+    content.style.padding = "28px 32px";
+    content.style.boxShadow = "0 8px 32px rgba(0,0,0,0.13)";
+    content.style.maxWidth = "350px";
+    content.style.width = "100%";
+    content.style.maxHeight = "70vh";
+    content.style.overflowY = "auto";
+    content.style.textAlign = "center";
+    content.innerHTML = `<h2 style="margin-top:0;font-size:1.3rem;color:#222;">Mood Log</h2>`;
+
+    const closeBtn = document.createElement("button");
+    closeBtn.textContent = "Close";
+    closeBtn.style.margin = "10px 0 0 0";
+    closeBtn.style.padding = "6px 18px";
+    closeBtn.style.border = "none";
+    closeBtn.style.borderRadius = "8px";
+    closeBtn.style.background = "#6B7280";
+    closeBtn.style.color = "#fff";
+    closeBtn.style.cursor = "pointer";
+    closeBtn.style.fontSize = "14px";
+    closeBtn.addEventListener("click", () => {
+      modal.classList.add("hidden");
+    });
+    content.appendChild(closeBtn);
+
+    const logList = document.createElement("div");
+    logList.style.marginTop = "18px";
+    logList.style.textAlign = "left";
+    logList.style.fontSize = "1.1rem";
+
+    chrome.storage.local.get({ moodLog: {} }, (data) => {
+      const moodLog = data.moodLog || {};
+      const days = Object.keys(moodLog).sort().reverse();
+      if (days.length === 0) {
+        logList.innerHTML = "<div style='color:#888;'>No moods logged yet.</div>";
+      } else {
+        logList.innerHTML = days
+          .map(
+            (day) =>
+              `<div style="margin-bottom:8px;"><span style="font-size:1.2em;margin-right:8px;">${moodLog[day].emoji}</span> <span style="color:#444;">${day}</span> <span style="color:#888;font-size:0.95em;">${moodLog[day].name}</span></div>`
+          )
+          .join("");
+      }
+    });
+    content.appendChild(logList);
+
+    modal.appendChild(content);
+    document.body.appendChild(modal);
+  }
+
+  // Insert mood selector on page load
+  createMoodSelector();
+  loadMoodForToday();
+  // --- Mood Selection Feature End ---
 });
